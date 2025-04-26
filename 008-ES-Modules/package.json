@@ -1,0 +1,14 @@
+{
+  "name": "008-es-modules",
+  "version": "1.0.0",
+  "main": "es-modules.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node es-modules.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

@@ -1,0 +1,19 @@
+{
+  "name": "009-npm",
+  "version": "1.0.0",
+  "main": "npm.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node npm.js",
+    "dev": "nodemon npm.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "express": "^5.1.0"
+  }
+}

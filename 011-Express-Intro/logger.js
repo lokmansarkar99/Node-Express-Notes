@@ -6,6 +6,10 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// const filename = new URL(import.meta.url).pathname
+
+// console.log(filename)
+
 const logger = async function (req, res, next) {
   const filePath = path.join(__dirname, 'log.txt')
 

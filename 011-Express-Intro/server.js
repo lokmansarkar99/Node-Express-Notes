@@ -1,8 +1,8 @@
 import express from 'express'
 import logger from './logger.js'
-
+import PORT from './env.js'
 const app = express()
-const PORT = 3000
+
 
 app.use(express.static('public')) // Serve static files from the 'public' directory
 app.get('/' , (req, res) => {

@@ -24,7 +24,8 @@ export const getLoginPage = (req, res) => {
  */
 export const postLoginPage = (req, res) => {
     
-    res.setHeader("Set-Cookie", "isLoggedIn=true; path=/;")
+    // res.setHeader("Set-Cookie", "isLoggedIn=true; path=/;")
+    res.cookie("isLoggedIn", true)
     res.redirect('/');
     
 }

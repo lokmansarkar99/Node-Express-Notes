@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 let isLoggedIn = req.cookies.isLoggedIn
 
 
-console.log( isLoggedIn)
+// console.log( isLoggedIn)
 
  res.render('Home', {isLoggedIn})
 });

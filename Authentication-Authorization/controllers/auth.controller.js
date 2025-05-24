@@ -1,4 +1,3 @@
-import { name } from 'ejs';
 import { getUserByEmail, createUser, generateToken } from '../services/auth.services.js';
 import argon2 from 'argon2'
 

@@ -8,6 +8,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cookieParser())
 app.use(verifyAuth)
+
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  return next();
+})
 app.use(express.static('public'))
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())

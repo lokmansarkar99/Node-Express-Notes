@@ -45,6 +45,7 @@ export const postRegisterPage = async (req, res) => {
  * @param {import('express').Response} res
  */
 export const getLoginPage = (req, res) => {
+if(req.user) {return res.redirect('/');}
     res.render('auth/Login')
 }
 
@@ -57,6 +58,9 @@ export const getLoginPage = (req, res) => {
 
 
 export const postLoginPage = async (req, res) => {
+
+  if(req.user) {return res.redirect('/');}
+
     try {
         const { email, password } = req.body;
 
@@ -94,7 +98,11 @@ export const postLoginPage = async (req, res) => {
             email: user.email
         })
 
-        res.cookie("access_token", token)
+        res.cookie("access_token", token , {
+            httpOnly: true,    // More secure
+            secure: false,     // Set true in production (HTTPS)
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 1 day
+        })
 
         res.redirect('/');
     } catch (error) {

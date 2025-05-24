@@ -1,5 +1,7 @@
 import prisma from '../controllers/prismaController.js'
 import argon2 from 'argon2'
+import jwt from 'jsonwebtoken'
+
 export const getUserByEmail = async (email) => {
   // findUnique expects a where object, not empty array
   const user = await prisma.user.findUnique({
@@ -21,4 +23,13 @@ export const createUser = async ({ name, email, password }) => {
 
  await console.log(newUser)
   return newUser;
+}
+
+
+export const generateToken = ({id,name, email}) =>{
+  
+  return jwt.sign({id,name, email}, process.env.JWT_SECRET,{
+    expiresIn: '30d'
+  } )
+
 }

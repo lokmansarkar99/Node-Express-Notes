@@ -1,4 +1,5 @@
-import { getUserByEmail, createUser } from '../services/auth.services.js';
+import { name } from 'ejs';
+import { getUserByEmail, createUser, generateToken } from '../services/auth.services.js';
 import argon2 from 'argon2'
 
 
@@ -81,12 +82,20 @@ export const postLoginPage = async (req, res) => {
         console.log("User exists and password is correct");
 
         // Set login cookie
-        res.cookie("isLoggedIn", "true", {
-            httpOnly: true,    // More secure
-            secure: false,     // Set true in production (HTTPS)
-            maxAge: 24 * 60 * 60 * 1000, // 1 day
-            path: '/'
-        });
+        // res.cookie("isLoggedIn", "true", {
+        //     httpOnly: true,    // More secure
+        //     secure: false,     // Set true in production (HTTPS)
+        //     maxAge: 24 * 60 * 60 * 1000, // 1 day
+        //     path: '/'
+        // });
+
+        const token = generateToken({
+            id: user.id,
+            name: user.name,
+            email: user.email
+        })
+
+        res.cookie("access_token", token)
 
         res.redirect('/');
     } catch (error) {

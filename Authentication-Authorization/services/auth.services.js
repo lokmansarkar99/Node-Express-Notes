@@ -33,3 +33,16 @@ export const generateToken = ({id,name, email}) =>{
   } )
 
 }
+
+
+// Verify the token and return the decoded payload
+export const verifyToken = (token) => {
+
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    throw new Error('Invalid token');
+    
+  }
+}

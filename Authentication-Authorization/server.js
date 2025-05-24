@@ -19,12 +19,12 @@ app.get('/', (req, res) => {
 
 // let isLoggedIn = req.headers.cookie;
 // isLoggedIn = Boolean(isLoggedIn?.split(";")?.find((cookie) => cookie.trim().startsWith("isLoggedIn"))?.split("=")[1]);
-let isLoggedIn = req.cookies.isLoggedIn
+let access_token= req.cookies.access_token
 
 
 // console.log( isLoggedIn)
 
- res.render('Home', {isLoggedIn})
+ res.render('Home', {access_token})
 });
 
 

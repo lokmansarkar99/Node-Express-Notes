@@ -103,3 +103,9 @@ export const postLoginPage = async (req, res) => {
     }
 };
 
+
+
+export const getLogout = (req, res) => {
+  res.clearCookie('access_token');
+  res.redirect('/login');
+}

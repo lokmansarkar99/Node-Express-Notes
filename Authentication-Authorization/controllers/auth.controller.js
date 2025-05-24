@@ -1,5 +1,5 @@
 import { getUserByEmail, createUser } from '../services/auth.services.js';
-
+import argon2 from 'argon2'
 
 
 /**
@@ -56,15 +56,10 @@ export const getLoginPage = (req, res) => {
 
 
 
-
 export const postLoginPage = async (req, res) => {
     try {
         const { email, password } = req.body;
-        
-        // Debug: Log received data
-        console.log('Received email:', email);
-        console.log('Received password:', password);
-        
+
         // Validate input
         if (!email || !password) {
             return res.status(400).send('Email and password are required');
@@ -72,30 +67,28 @@ export const postLoginPage = async (req, res) => {
 
         // Check if user exists
         const user = await getUserByEmail(email);
-        console.log('Found user:', user);
-        
-        if (!user) { 
-            return res.status(401).send('Invalid email '); // Don't reveal which is wrong
+        if (!user) {
+            return res.status(401).send('Invalid email or password');
         }
 
-        // Check password
-        if (user.password !== password) {
-            return res.status(401).send('Invalid  password');
+        // Compare input password with stored hashed password
+        const isPasswordValid = await argon2.verify(user.password, password);
+        if (!isPasswordValid) {
+            return res.status(401).send('Invalid email or password');
         }
 
-        // Success - set cookie and redirect
+        // Debug: Optional logs
         console.log("User exists and password is correct");
-        
-        // Set cookie with proper options
+
+        // Set login cookie
         res.cookie("isLoggedIn", "true", {
-            httpOnly: false,  // Allow client-side access if needed
-            secure: false,    // Set to true in production with HTTPS
+            httpOnly: true,    // More secure
+            secure: false,     // Set true in production (HTTPS)
             maxAge: 24 * 60 * 60 * 1000, // 1 day
             path: '/'
         });
-        
+
         res.redirect('/');
-        
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).send('Internal server error');

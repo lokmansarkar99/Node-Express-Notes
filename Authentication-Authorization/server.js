@@ -1,12 +1,22 @@
 // server.js
 import express from 'express';
 import cookieParser from 'cookie-parser';
+
+import session from 'express-session';
+import flash from 'connect-flash'
 import { authRoutes } from './routes/routes.js';
 import { verifyAuth } from './middleware/verify.middleware.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cookieParser())
+app.use(session({
+  secret:  process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized:false
+
+}))
+app.use(flash())
 app.use(verifyAuth)
 
 app.use((req, res, next) => {

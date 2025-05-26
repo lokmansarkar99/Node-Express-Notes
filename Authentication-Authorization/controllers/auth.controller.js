@@ -9,7 +9,7 @@ import argon2 from 'argon2'
 
 
 export const getRegisterPage = (req, res) => {
-    res.render('auth/Register')
+    res.render('auth/Register',{eu_errors: req.flash('eu_errors')})
 }
 
 /**
@@ -25,8 +25,8 @@ export const postRegisterPage = async (req, res) => {
     const existingUser = await getUserByEmail(email);
 
     if (existingUser) {
-      // User already exists, send a message (you can also render page with error)
-      return res.status(400).send('User already exists with this email');
+      req.flash('eu_errors', 'User already exists with this email');
+      return res.redirect('/register');
     }
 
     await createUser({ name, email, password });
@@ -39,14 +39,13 @@ export const postRegisterPage = async (req, res) => {
 };
 
 
-
 /**
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  */
 export const getLoginPage = (req, res) => {
 if(req.user) {return res.redirect('/');}
-    res.render('auth/Login')
+    res.render('auth/Login', {ene_errors: req.flash('ene_errors')})
 }
 
 
@@ -72,13 +71,16 @@ export const postLoginPage = async (req, res) => {
         // Check if user exists
         const user = await getUserByEmail(email);
         if (!user) {
-            return res.status(401).send('Invalid email or password');
+            req.flash('ene_errors', 'Invalid email or password');
+            return res.redirect('/login');
         }
 
         // Compare input password with stored hashed password
         const isPasswordValid = await argon2.verify(user.password, password);
         if (!isPasswordValid) {
-            return res.status(401).send('Invalid email or password');
+            req.flash('ene_errors', 'Invalid email or password');
+            return res.redirect('/login');
+
         }
 
         // Debug: Optional logs
@@ -111,6 +113,10 @@ export const postLoginPage = async (req, res) => {
     }
 };
 
+/**
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 
 
 export const getLogout = (req, res) => {

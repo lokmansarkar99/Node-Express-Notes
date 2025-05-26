@@ -64,6 +64,12 @@
     background-color: #555;
   }
 
+  .error-message {
+    color: red;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+  }
+
   @media (max-width: 500px) {
     .login-form {
       padding: 1.5rem;
@@ -90,6 +96,11 @@
     <input type="password" id="password" name="password" required  />
   </div>
   <div class="form-group">
+
+    <!-- Handle error with flash message and ejs ene_errors message -->
+    <% if (ene_errors) { %>
+      <div class="error-message"><%= ene_errors %></div>
+    <% } %>
     <button type="submit" >Login</button>
   </div>
 </form>

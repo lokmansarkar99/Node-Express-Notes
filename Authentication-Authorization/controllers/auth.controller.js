@@ -1,3 +1,4 @@
+import { loginUserSchema, registerUserSchema } from '../validators/auth_validators.js';
 import { getUserByEmail, createUser, generateToken } from '../services/auth.services.js';
 import argon2 from 'argon2'
 
@@ -9,7 +10,7 @@ import argon2 from 'argon2'
 
 
 export const getRegisterPage = (req, res) => {
-    res.render('auth/Register',{eu_errors: req.flash('eu_errors')})
+    res.render('auth/Register',{errors: req.flash('errors')})
 }
 
 /**
@@ -19,13 +20,23 @@ export const getRegisterPage = (req, res) => {
 
 
 export const postRegisterPage = async (req, res) => {
-  const { name, email, password } = req.body;
+  // const { name, email, password } = req.body;
+
+ const {data, error} =  registerUserSchema.safeParse(req.body)
+  const { name, email, password } = data;
+//  console.log("Data" , data)
+  if (error) { 
+    const errors = error.errors[0].message;
+    req.flash('errors', errors);
+    console.error('Validation error:', error);
+    res.redirect('/register');
+  }
 
   try {
     const existingUser = await getUserByEmail(email);
 
     if (existingUser) {
-      req.flash('eu_errors', 'User already exists with this email');
+      req.flash('errors', 'User already exists with this email');
       return res.redirect('/register');
     }
 
@@ -45,7 +56,7 @@ export const postRegisterPage = async (req, res) => {
  */
 export const getLoginPage = (req, res) => {
 if(req.user) {return res.redirect('/');}
-    res.render('auth/Login', {ene_errors: req.flash('ene_errors')})
+    res.render('auth/Login', {errors: req.flash('errors')})
 }
 
 
@@ -61,7 +72,16 @@ export const postLoginPage = async (req, res) => {
   if(req.user) {return res.redirect('/');}
 
     try {
-        const { email, password } = req.body;
+        // const { email, password } = req.body;
+       const {data, error} = loginUserSchema.safeParse(req.body)
+
+        if (error) { 
+            const errors = error.errors[0].message;
+            req.flash('errors', errors);
+            console.error('Validation error:', error);
+            return res.redirect('/login');
+        }
+        const { email, password } = data;
 
         // Validate input
         if (!email || !password) {
@@ -71,14 +91,14 @@ export const postLoginPage = async (req, res) => {
         // Check if user exists
         const user = await getUserByEmail(email);
         if (!user) {
-            req.flash('ene_errors', 'Invalid email or password');
+            req.flash('errors', 'Invalid email or password');
             return res.redirect('/login');
         }
 
         // Compare input password with stored hashed password
         const isPasswordValid = await argon2.verify(user.password, password);
         if (!isPasswordValid) {
-            req.flash('ene_errors', 'Invalid email or password');
+            req.flash('errors', 'Invalid email or password');
             return res.redirect('/login');
 
         }

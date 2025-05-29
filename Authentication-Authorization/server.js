@@ -1,11 +1,14 @@
 // server.js
 import express from 'express';
 import cookieParser from 'cookie-parser';
-
 import session from 'express-session';
+import requestIp from 'request-ip'
 import flash from 'connect-flash'
+
+
 import { authRoutes } from './routes/routes.js';
 import { verifyAuth } from './middleware/verify.middleware.js';
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -17,6 +20,8 @@ app.use(session({
 
 }))
 app.use(flash())
+
+app.use(requestIp.mw())
 app.use(verifyAuth)
 
 app.use((req, res, next) => {
@@ -26,6 +31,7 @@ app.use((req, res, next) => {
 app.use(express.static('public'))
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
+
 app.set("view engine", "ejs")
 
 app.use(authRoutes)

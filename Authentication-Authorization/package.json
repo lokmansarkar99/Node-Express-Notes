@@ -21,6 +21,7 @@
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
+    "request-ip": "^3.3.0",
     "zod": "^3.25.28"
   },
   "devDependencies": {

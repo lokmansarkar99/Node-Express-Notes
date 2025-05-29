@@ -1,6 +1,7 @@
 import { loginUserSchema, registerUserSchema } from '../validators/auth_validators.js';
-import { getUserByEmail, createUser, generateToken } from '../services/auth.services.js';
+import { getUserByEmail, createUser, generateToken , createSession, createAccessToken, createRefreshToken} from '../services/auth.services.js';
 import argon2 from 'argon2'
+import prisma from './prismaController.js';
 
 
 /**
@@ -106,25 +107,41 @@ export const postLoginPage = async (req, res) => {
         // Debug: Optional logs
         console.log("User exists and password is correct");
 
-        // Set login cookie
-        // res.cookie("isLoggedIn", "true", {
-        //     httpOnly: true,    // More secure
-        //     secure: false,     // Set true in production (HTTPS)
-        //     maxAge: 24 * 60 * 60 * 1000, // 1 day
-        //     path: '/'
-        // });
 
-        const token = generateToken({
-            id: user.id,
-            name: user.name,
-            email: user.email
+   
+
+
+        // Create a session for the user
+        const session = await createSession( user.id, {
+         ipAddress: req.clientIp,
+          userAgent: req.headers['user-agent'],
+          
         })
 
-        res.cookie("access_token", token , {
-            httpOnly: true,    // More secure
-            secure: false,     // Set true in production (HTTPS)
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 1 day
+        // access token create
+        const accessToken = createAccessToken({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          sessionId: prisma.session.id
         })
+
+
+        // create refresh token
+        const refreshToken = createRefreshToken(prisma.session.id)
+
+        const baseConfig = {httpOnly: true, secure: true}
+        // Set the access token in a cookie
+        res.cookie('access_token', accessToken, { 
+            ...baseConfig,
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
+
+// set the refresh token in a cookie
+        res.cookie('refresh_token', refreshToken, { 
+            ...baseConfig,
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
 
         res.redirect('/');
     } catch (error) {

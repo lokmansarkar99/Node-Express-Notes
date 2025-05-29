@@ -23,4 +23,19 @@ model User {
   password  String   @db.VarChar(255)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+  sessions  Session[] 
+}
+
+
+model Session{
+  id        Int      @id @default(autoincrement())
+  user_id Int 
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  valid Boolean @default(true)
+  userAgent String? @db.VarChar(255)
+  ipAddress String? @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+
 }

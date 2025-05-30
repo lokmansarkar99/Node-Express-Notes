@@ -117,18 +117,18 @@ export const postLoginPage = async (req, res) => {
           userAgent: req.headers['user-agent'],
           
         })
-
+console.log("User object before accessing ID:", user); // or req.user
         // access token create
         const accessToken = createAccessToken({
           id: user.id,
           name: user.name,
           email: user.email,
-          sessionId: prisma.session.id
+          sessionId: session.id
         })
 
 
         // create refresh token
-        const refreshToken = createRefreshToken(prisma.session.id)
+        const refreshToken = createRefreshToken(session.id)
 
         const baseConfig = {httpOnly: true, secure: true}
         // Set the access token in a cookie

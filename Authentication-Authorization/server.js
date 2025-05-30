@@ -22,6 +22,9 @@ app.use(session({
 app.use(flash())
 
 app.use(requestIp.mw())
+
+// Must be used after cookieParser and session middleware
+// Middleware to verify authentication
 app.use(verifyAuth)
 
 app.use((req, res, next) => {

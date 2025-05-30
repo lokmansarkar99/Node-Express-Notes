@@ -1,6 +1,7 @@
 import prisma from '../controllers/prismaController.js'
 import argon2 from 'argon2'
 import e from 'connect-flash';
+import session from 'express-session';
 import jwt from 'jsonwebtoken'
 
 
@@ -59,8 +60,13 @@ export const createSession = async (userId, {ipAddress, userAgent}) => {
      ipAddress,
      userAgent
     }
+    
+
+
   })
 
+
+  return session;
 }
 
 // create access token
@@ -78,3 +84,60 @@ export const createRefreshToken = (sessionId) => {
     expiresIn: '30d' // Refresh token valid for 30 days
   });
 }
+
+
+// refrsh tokens
+
+export const refreshTokens = async (refreshToken) => { 
+  try {
+    
+    const decodedToken = verifyToken(refreshToken)
+
+
+      const currentSession = await prisma.session.findUnique({
+        where: {
+          id: decodedToken.sessionId
+        }
+      });
+
+      if(!currentSession || !currentSession.valid) {
+        throw new Error('Invalid session');
+      }
+
+      const user = await prisma.user.findUnique({
+        where: {
+          id: currentSession.user_id
+        }
+      });
+
+      if(!user) {
+        throw new Error('User not found');
+      }
+
+      // Create new access token
+      const userInfo = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        sessionId: currentSession.id
+      }
+
+      const newAccessToken = createAccessToken(userInfo);
+
+      // Create new refresh token
+      const newRefreshToken = createRefreshToken(currentSession.id);
+      
+      
+      return { newAccessToken, newRefreshToken, user:userInfo };
+
+
+
+  } catch (error) {
+    
+    console.error('Error refreshing tokens:', error);
+    throw new Error('Failed to refresh tokens');
+  }
+
+
+}
+ 

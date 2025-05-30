@@ -4,4 +4,4 @@ export const protect = (req, res, next) => {
     return res.status(401).send('Not logged in');
   }
   next();
-};
+}

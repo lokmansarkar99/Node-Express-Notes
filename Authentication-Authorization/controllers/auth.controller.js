@@ -1,5 +1,5 @@
 import { loginUserSchema, registerUserSchema } from '../validators/auth_validators.js';
-import { getUserByEmail, createUser, generateToken , createSession, createAccessToken, createRefreshToken} from '../services/auth.services.js';
+import { getUserByEmail, createUser, generateToken , createSession, createAccessToken, createRefreshToken, clearUserSession} from '../services/auth.services.js';
 import argon2 from 'argon2'
 import prisma from './prismaController.js';
 
@@ -156,7 +156,11 @@ console.log("User object before accessing ID:", user); // or req.user
  */
 
 
-export const getLogout = (req, res) => {
+export const getLogout = async (req, res) => {
+
+  await clearUserSession(req.user.sessionId)
   res.clearCookie('access_token');
+  res.clearCookie('refresh_token');
+  req.flash('success', 'You have been logged out successfully');
   res.redirect('/login');
 }

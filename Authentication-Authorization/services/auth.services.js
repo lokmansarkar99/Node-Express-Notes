@@ -141,3 +141,26 @@ export const refreshTokens = async (refreshToken) => {
 
 }
  
+
+// Clear User Session
+export const clearUserSession = async (sessionId) => {
+  try {
+    // update the session from the database
+    // await prisma.session.update({
+    //   where: { id: sessionId },
+    //   data: { valid: false } // Mark the session as invalid
+    // });
+    // Optionally, you can also delete the session
+    await prisma.session.delete({
+      where: { id: sessionId }
+    });
+    console.log('User session cleared successfully');
+
+
+    
+    return true;
+  } catch (error) {
+    console.error('Error clearing user session:', error);
+    throw new Error('Failed to clear user session');
+  }
+}

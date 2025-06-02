@@ -41,9 +41,55 @@ export const postRegisterPage = async (req, res) => {
       return res.redirect('/register');
     }
 
-    await createUser({ name, email, password });
+    const newUser = await createUser({ name, email, password });
+    console.log("User created successfully", newUser);
+    req.flash('success', 'User registered successfully');
 
-    res.redirect('/login');
+
+
+// Get user by email
+        const user = await getUserByEmail(email);
+        if (!user) { 
+            req.flash('errors', 'User not found');
+            return res.redirect('/register');
+        }
+
+        // Create a session for the user
+        const session = await createSession( user.id, {
+         ipAddress: req.clientIp,
+          userAgent: req.headers['user-agent'],
+          
+        })
+console.log("User object before accessing ID:", user); // or req.user
+        // access token create
+        const accessToken = createAccessToken({
+          id: user.id,
+          name: name,
+          email: email,
+          sessionId: session.id
+        })
+
+
+        // create refresh token
+        const refreshToken = createRefreshToken(session.id)
+
+        const baseConfig = {httpOnly: true, secure: true}
+        // Set the access token in a cookie
+        res.cookie('access_token', accessToken, { 
+            ...baseConfig,
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
+
+// set the refresh token in a cookie
+        res.cookie('refresh_token', refreshToken, { 
+            ...baseConfig,
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
+
+        res.redirect('/');
+
+
+    // res.redirect('/login');
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).send('Internal Server Error');
